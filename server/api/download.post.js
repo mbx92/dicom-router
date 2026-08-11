@@ -1,4 +1,10 @@
 import {
+  clearComposeDir,
+  listComposeFiles,
+  saveZip,
+  unzipCompose,
+} from '../utils/compose-fs'
+import {
   downloadDockerCompose,
   getAccessToken,
   resolveEnvironment,
@@ -9,6 +15,7 @@ export default defineEventHandler(async (event) => {
   const environment = resolveEnvironment(body?.environment)
   const clientId = String(body?.clientId || '').trim()
   const clientSecret = String(body?.clientSecret || '').trim()
+  const mode = String(body?.mode || getQuery(event)?.mode || 'disk').toLowerCase()
 
   if (!environment) {
     throw createError({
@@ -36,13 +43,29 @@ export default defineEventHandler(async (event) => {
       accessToken,
     })
 
-    setResponseHeaders(event, {
-      'Content-Type': file.contentType,
-      'Content-Disposition': `attachment; filename="${file.filename}"`,
-      'Cache-Control': 'no-store',
-    })
+    if (mode === 'browser') {
+      setResponseHeaders(event, {
+        'Content-Type': file.contentType,
+        'Content-Disposition': `attachment; filename="${file.filename}"`,
+        'Cache-Control': 'no-store',
+      })
+      return file.buffer
+    }
 
-    return file.buffer
+    await clearComposeDir()
+    await saveZip(file.buffer)
+    const extracted = await unzipCompose()
+    const files = extracted.files.length
+      ? extracted.files
+      : await listComposeFiles()
+
+    return {
+      ok: true,
+      composeFile: extracted.composeFile,
+      routerConfFile: extracted.routerConfFile,
+      files,
+      filename: file.filename,
+    }
   } catch (error) {
     throw createError({
       statusCode: error.statusCode || 502,

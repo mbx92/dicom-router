@@ -7,6 +7,14 @@ export default defineNuxtConfig({
     shim: false,
   },
   css: ['~/assets/css/main.css'],
+  routeRules: {
+    '/compose/**': { prerender: false, index: false },
+  },
+  nitro: {
+    externals: {
+      external: ['better-sqlite3'],
+    },
+  },
   app: {
     head: {
       title: 'DICOM Router — SATUSEHAT Downloader',
@@ -14,10 +22,13 @@ export default defineNuxtConfig({
         {
           name: 'description',
           content:
-            'Download docker-compose.zip terbaru untuk DICOM Router SATUSEHAT tanpa Postman.',
+            'Ambil, edit, dan deploy docker-compose DICOM Router SATUSEHAT tanpa Postman.',
         },
       ],
       link: [
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+        { rel: 'shortcut icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         {
           rel: 'preconnect',

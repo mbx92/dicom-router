@@ -2,16 +2,24 @@
   "name": "dicom-router",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@11.15.1",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "start": "node .output/server/index.mjs",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@lucide/vue": "^1.31.0",
+    "adm-zip": "^0.6.0",
+    "better-sqlite3": "^13.0.3",
     "nuxt": "^4.5.2",
     "vue": "^3.5.41",
     "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8"
   }
 }

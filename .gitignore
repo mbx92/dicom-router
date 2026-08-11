@@ -9,6 +9,9 @@ dist
 # Node dependencies
 node_modules
 
+# Downloaded / edited compose artifacts (may contain secrets)
+public/compose
+
 # Logs
 logs
 *.log
@@ -22,3 +25,4 @@ logs
 .env
 .env.*
 !.env.example
+DESIGN.md

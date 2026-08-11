@@ -1,0 +1,48 @@
+[Unit]
+Description=DICOM Router Manager (Nuxt)
+Documentation=file:///opt/dicom-router/README.md
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=dicom
+Group=dicom
+SupplementaryGroups=docker
+
+WorkingDirectory=/opt/dicom-router
+
+# Production env (override secrets in /opt/dicom-router/.env)
+Environment=NODE_ENV=production
+Environment=HOST=0.0.0.0
+Environment=PORT=3000
+Environment=NITRO_HOST=0.0.0.0
+Environment=NITRO_PORT=3000
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=-/opt/dicom-router/.env
+
+# Prefer absolute node path (nvm: /root/.nvm/versions/node/v22.19.0/bin/node)
+ExecStart=/usr/bin/node /opt/dicom-router/.output/server/index.mjs
+ExecReload=/bin/kill -HUP $MAINPID
+
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillMode=mixed
+
+# Hardening (keep write access for compose + sqlite)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+# Set false automatically by install-service.sh when Node lives under /root/.nvm
+ProtectHome=true
+ReadWritePaths=/opt/dicom-router/.data /opt/dicom-router/public/compose /opt/dicom-router/.output
+
+# Logs → journald: journalctl -u dicom-router -f
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dicom-router
+
+[Install]
+WantedBy=multi-user.target
